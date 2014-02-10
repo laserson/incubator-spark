@@ -236,6 +236,27 @@ class SparkContext(object):
         return RDD(self._jsc.textFile(name, minSplits), self,
                    UTF8Deserializer())
 
+    def parquetFileAsJSON(self, name):
+        """
+        Read a Parquet format file from HDFS, a local file system (available on
+        all nodes), or any Hadoop-supported file system URI, and return it as an
+        RDD of JSON strings (via Avro objects).
+        
+        This function needs at most the following Parquet jars on the
+        SPARK_CLASSPATH:
+            parquet-format-*.jar
+            parquet-avro-*.jar
+            parquet-hadoop-*.jar
+            parquet-common-*.jar
+            parquet-column-*.jar
+            parquet-jackson-*.jar
+            parquet-encoding-*.jar
+        
+        It may also require that the maven-shade-plugin be disabled from the
+        parquet-avro build.
+        """
+        return RDD(self._jsc.parquetFileAsJSON(name), self, UTF8Deserializer())
+
     def _checkpointFile(self, name, input_deserializer):
         jrdd = self._jsc.checkpointFile(name)
         return RDD(jrdd, self, input_deserializer)

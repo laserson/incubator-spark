@@ -273,6 +273,27 @@ class JavaSparkContext(val sc: SparkContext) extends JavaSparkContextVarargsWork
   }
 
   /**
+   * Get an RDD for a Parquet format file loaded as JSON strings.
+   *
+   * Note: requires Parquet jars in the SPARK_CLASSPATH; at most these:
+   *   parquet-format-*.jar
+   *   parquet-avro-*.jar
+   *   parquet-hadoop-*.jar
+   *   parquet-common-*.jar
+   *   parquet-column-*.jar
+   *   parquet-jackson-*.jar
+   *   parquet-encoding-*.jar
+   *
+   * It may also require that the maven-shade-plugin be disabled from the parquet-avro build.
+   *
+   * @param path Path to the Parquet file (HDFS, local disk, etc.)
+   * @return JavaRDD[String] with the JSON strings representing the Parquet objects
+   */
+  def parquetFileAsJSON(path: String): JavaRDD[String] = {
+    new JavaRDD(sc.parquetFileAsJSON(path, hadoopConfiguration))
+  }
+
+  /**
    * Get an RDD for a given Hadoop file with an arbitrary new API InputFormat
    * and extra configuration options to pass to the input format.
    *

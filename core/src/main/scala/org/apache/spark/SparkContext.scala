@@ -50,6 +50,9 @@ import org.apache.spark.storage.{BlockManagerSource, RDDInfo, StorageStatus, Sto
 import org.apache.spark.ui.SparkUI
 import org.apache.spark.util.{Utils, TimeStampedHashMap, MetadataCleaner, MetadataCleanerType,
   ClosureCleaner}
+import org.apache.avro.generic.GenericRecord
+import parquet.hadoop.ParquetInputFormat
+import parquet.avro.AvroReadSupport
 
 /**
  * Main entry point for Spark functionality. A SparkContext represents the connection to a Spark
@@ -342,6 +345,28 @@ class SparkContext(
   def textFile(path: String, minSplits: Int = defaultMinSplits): RDD[String] = {
     hadoopFile(path, classOf[TextInputFormat], classOf[LongWritable], classOf[Text],
       minSplits).map(pair => pair._2.toString)
+  }
+
+  /**
+   * Read a parquet file from HDFS, a local file system (available on all nodes), or any
+   * Hadoop-supported file system URI, and return it as an RDD of JSON strings.
+   *
+   * Note: requires Parquet jars in the SPARK_CLASSPATH; at most these:
+   *   parquet-format-*.jar
+   *   parquet-avro-*.jar
+   *   parquet-hadoop-*.jar
+   *   parquet-common-*.jar
+   *   parquet-column-*.jar
+   *   parquet-jackson-*.jar
+   *   parquet-encoding-*.jar
+   *
+   * It may also require that the maven-shade-plugin be disabled from the parquet-avro build.
+   */
+  def parquetFileAsJSON(path: String, conf: Configuration = hadoopConfiguration): RDD[String] = {
+    val job = new NewHadoopJob(conf)
+    ParquetInputFormat.setReadSupportClass(job, classOf[AvroReadSupport[GenericRecord]])
+    newAPIHadoopFile(path, classOf[ParquetInputFormat[GenericRecord]], classOf[Void], classOf[GenericRecord],
+        job.getConfiguration).map(pair => pair._2.toString)
   }
 
   /**

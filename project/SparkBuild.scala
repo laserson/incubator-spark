@@ -245,7 +245,8 @@ object SparkBuild extends Build {
     name := "spark-core",
     resolvers ++= Seq(
        "JBoss Repository"     at "http://repository.jboss.org/nexus/content/repositories/releases/",
-       "Cloudera Repository"  at "https://repository.cloudera.com/artifactory/cloudera-repos/"
+       "Cloudera Repository"  at "https://repository.cloudera.com/artifactory/cloudera-repos/",
+       "Sonatype Repository"  at "https://oss.sonatype.org/content/repositories/snapshots"
     ),
 
     libraryDependencies ++= Seq(
@@ -278,7 +279,12 @@ object SparkBuild extends Build {
         "com.codahale.metrics"     % "metrics-graphite" % "3.0.0",
         "com.twitter"             %% "chill"            % "0.3.1",
         "com.twitter"              % "chill-java"       % "0.3.1",
-        "com.clearspring.analytics" % "stream"          % "2.5.1"
+        "com.clearspring.analytics" % "stream"          % "2.5.1",
+        "com.twitter"              % "parquet-common"   % "1.0.0",
+        "com.twitter"              % "parquet-encoding" % "1.0.0",
+        "com.twitter"              % "parquet-column"   % "1.0.0",
+        "com.twitter"              % "parquet-hadoop"   % "1.0.0",
+        "com.twitter"              % "parquet-avro"     % "1.0.0"
       )
   )
 
